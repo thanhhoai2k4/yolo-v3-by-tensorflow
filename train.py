@@ -15,7 +15,7 @@ except:
     yolo_model = create_yolo_v3()
     print("create a new model yolo v3 !")
 
-optimizer = tf.keras.optimizers.Adam(0.0001)
+optimizer = tf.keras.optimizers.Adam(0.001)
 yolo_model.compile(optimizer=optimizer, loss=[getloss(num_class, anchors[0]),
                                               getloss(num_class,anchors[1]),
                                               getloss(num_class,anchors[2])], run_eagerly=False)
@@ -51,9 +51,9 @@ dataset_val = dataset_val.prefetch(tf.data.experimental.AUTOTUNE)
 
 reduce_lr_callback = ReduceLROnPlateau(
     monitor='val_loss',
-    factor=0.1,
+    factor=0.2,
     patience=2,
-    min_lr=0.00001,
+    min_lr=0.0001,
     verbose=1
 )
 

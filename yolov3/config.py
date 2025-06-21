@@ -2,7 +2,7 @@ import numpy as np
 import os
 
 num_class = 3
-checkpoint_path = "model1.h5"
+checkpoint_path = "model.h5"
 batch_size = 2
 epochs = 50
 anchors = np.array([[[116, 90], [156, 198], [373, 326]],
