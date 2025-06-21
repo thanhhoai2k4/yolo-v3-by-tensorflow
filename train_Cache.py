@@ -19,12 +19,12 @@ if  not os.path.exists("model1.h5"):
 
     yolo_model = create_yolo_v3()
     optimizer = tf.keras.optimizers.Adam(0.001)
-    yolo_model.compile(optimizer=optimizer, loss=[getloss(3, anchors[0]), getloss(3,anchors[1]), getloss(3,anchors[2])], run_eagerly=False)
+    yolo_model.compile(optimizer=optimizer, loss=[getloss(3, anchors[0]), getloss(3,anchors[1]), getloss(3,anchors[2])], run_eagerly=True)
 else:
     print("load model tuyen huan luyen")
     yolo_model = tf.keras.models.load_model("model1.h5")
     optimizer = tf.keras.optimizers.Adam(0.001)
-    yolo_model.compile(optimizer=optimizer, loss=[getloss(3, anchors[0]), getloss(3,anchors[1]), getloss(3,anchors[2])], run_eagerly=False)
+    yolo_model.compile(optimizer=optimizer, loss=[getloss(3, anchors[0]), getloss(3,anchors[1]), getloss(3,anchors[2])], run_eagerly=True)
 
 
 imgs , head13, head26, head52 = datagenerator_cache()
