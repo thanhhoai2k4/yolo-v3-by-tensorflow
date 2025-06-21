@@ -101,15 +101,16 @@ def getloss(num_class,anchors ,weight = [5.0, 1.0, 0.2, 1.0], IGNORE_THRESH=0.6)
         mask_object = tf.cast(y_true[...,4:5]==1.0, tf.float32)
         mask_no_object = tf.cast(y_true[...,4:5]==0, tf.float32)
 
-        xy_loss = tf.squeeze(mask_object, axis=-1) * tf.keras.losses.binary_crossentropy(y_true[...,0:2], y_pred[...,0:2], from_logits=False)
-        wh_loss =  mask_object * 0.5 * tf.square(y_true[...,2:4] - y_pred[...,2:4])
-        box_loss = tf.reduce_sum(xy_loss) + tf.reduce_sum(wh_loss)
-
         # box = tf.expand_dims(tf.keras.losses.MSE(y_true[...,0:4], y_pred[...,0:4]),axis=-1) * mask_object
         # box_loss = tf.math.reduce_sum(box)
 
         xywh_true = t_xywh_to_xyxy(y_true[...,0:4], grid, anchors)
         xywh_pred = t_xywh_to_xyxy(y_pred[...,0:4], grid, anchors)
+
+        giou = tf.expand_dims(bbox_giou(xywh_true, xywh_pred), axis=-1)
+        bbox_loss_scale = 2.0 - 1.0 * xywh_true[:, :, :, :, 2:3] * xywh_true[:, :, :, :, 3:4]
+        giou_loss = (1-giou) * mask_object * bbox_loss_scale
+        box_loss = tf.reduce_sum(giou_loss)
 
         ious = compute_iou_for_yolo(xywh_true, xywh_pred)
         ignore_mask = tf.cast(ious < IGNORE_THRESH, tf.float32)
