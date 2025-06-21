@@ -191,7 +191,7 @@ def inference(path, num_classes, model):
         ac = anchors[i].reshape(-1,2)
         decoded_preds = decode_predictions(kq[i], ac, grid_size[i], num_classes)[0]
         confidences = decoded_preds[..., 4]
-        mask = confidences >= 0.6
+        mask = confidences >= 0.9
         decoded_preds = decoded_preds[mask]
 
         for j in range(decoded_preds.shape[0]):
