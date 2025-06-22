@@ -4,12 +4,12 @@ import tensorflow as tf
 from yolov3.losses import getloss
 import os
 from tensorflow.keras.callbacks import ReduceLROnPlateau
-from yolov3.config import checkpoint_path, batch_size, epochs, anchors, num_class, step_per_epoch, step_per_val
+from yolov3.config import checkpoint_path, batch_size, epochs, anchors, num_class, step_per_epoch, step_per_val, checkpoint_path
 
 
 
 try:
-    yolo_model = tf.keras.models.load_model("model.h5")
+    yolo_model = tf.keras.models.load_model(checkpoint_path)
     print("load a pre model yolo v3 !")
 except:
     yolo_model = create_yolo_v3()
@@ -53,7 +53,7 @@ reduce_lr_callback = ReduceLROnPlateau(
     monitor='val_loss',
     factor=0.2,
     patience=2,
-    min_lr=0.0001,
+    min_lr=0.00001,
     verbose=1
 )
 
