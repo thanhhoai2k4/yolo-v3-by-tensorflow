@@ -2,9 +2,8 @@ from yolov3.yolo_v3_model import create_yolo_v3
 from yolov3.data_loader import datagenerator, datagenerator_val
 import tensorflow as tf
 from yolov3.losses import getloss
-import os
 from tensorflow.keras.callbacks import ReduceLROnPlateau
-from yolov3.config import checkpoint_path, batch_size, epochs, anchors, num_class, step_per_epoch, step_per_val, checkpoint_path
+from yolov3.config import batch_size, epochs, anchors, num_class, step_per_epoch, step_per_val, checkpoint_path
 
 
 
