@@ -2,12 +2,8 @@
 import cv2
 import tensorflow as tf
 import numpy as np
+from yolov3.config import anchors
 
-
-anchors = np.array([[[116,90], [156,198], [373,326]],
-                    [[30,61], [62,45], [59,119]],
-                    [[10,13], [16,30], [33,23]]],
-                   dtype=np.float32) / 416
 class_ids = ["mask_weared_incorrect", "without_mask","with_mask"]
 class_mapping_decoder = dict(zip( range(len(class_ids)), class_ids ))
 class_mapping_encoder = dict(zip(class_ids, range(len(class_ids))))

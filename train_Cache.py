@@ -2,16 +2,11 @@ from yolov3.yolo_v3_model import create_yolo_v3
 from yolov3.data_loader import datagenerator_cache
 import tensorflow as tf
 from yolov3.losses import getloss
-import numpy as np
+from yolov3.config import  anchors
 import os
 
 xml_list = os.listdir("data/annotations") # lay danh sach cac file xml
 batch_size = 1
-
-anchors = np.array([[[116,90], [156,198], [373,326]],
-                    [[30,61], [62,45], [59,119]],
-                    [[10,13], [16,30], [33,23]]],
-                   dtype=np.float32) / 416
 
 epochs = 60
 
