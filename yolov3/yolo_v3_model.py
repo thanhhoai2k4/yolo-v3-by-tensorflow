@@ -134,7 +134,7 @@ def decode_predictions(y_pred, anchors, grid_size, num_classes=3):
                    Shape: (batch_size, grid_size * grid_size * num_anchors, 5 + num_classes)
     """
     # Lấy các thông số từ shape của tensor
-    batch_size = tf.shape(y_pred)[0]
+    batch_size = y_pred.shape[0]
     num_anchors = len(anchors)
 
     # Reshape đầu vào để dễ xử lý hơn
@@ -193,8 +193,12 @@ def inference(path, num_classes, model):
         confidences = decoded_preds[..., 4]
         mask = confidences >= 0.8
         decoded_preds = decoded_preds[mask]
+        scores = confidences[mask]
 
-        for j in range(decoded_preds.shape[0]):
+        nms = tf.image.non_max_suppression(
+            boxes=decoded_preds[...,0:4], scores=scores, max_output_size=20, iou_threshold=0.5
+        )
+        for j in nms:
             x,y,w,h = decoded_preds[j][:4] * 416
             c = decoded_preds[j][4]
             p = decoded_preds[j][5:]
