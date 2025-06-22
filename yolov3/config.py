@@ -5,9 +5,9 @@ num_class = 3
 checkpoint_path = "model.h5"
 batch_size = 10
 epochs = 100
-anchors = np.array([[[116, 90], [156, 198], [373, 326]],
-                    [[30, 61], [62, 45], [59, 119]],
-                    [[10, 13], [16, 30], [33, 23]]],
+anchors = np.array([[[40, 44], [59, 64], [103, 124]],
+                    [[18, 25], [24, 25], [30, 33]],
+                    [[7, 8], [11, 12], [15, 17]]],
                    dtype=np.float32) / 416
 
 class_ids = ["mask_weared_incorrect", "without_mask","with_mask"]
