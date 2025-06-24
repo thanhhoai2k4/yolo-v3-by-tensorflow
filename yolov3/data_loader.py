@@ -187,19 +187,25 @@ def encode_boxes(boxes: np.ndarray, grid_size_list: list[int, int, int] = [13, 2
     return y_true_13, y_true_26, y_true_52
 
 
-def data_agrument(image, boxes):
+def data_agrument_flip(image, boxes):
+    """
 
+        tra ve anh va boxes da duuoc fliped
+    Args:
+        image: width, height, channel
+        boxes: da o dang chuan hoa
 
+    Returns: image boxes
+
+    """
+    temp_box = []
+    image = np.flip(image, 1)
     if np.random.random() > 0.5:
-        image = np.fliplr(image,axis = 1)
-        temp_box = []
         for box in boxes:
 
             x_center, y_center, width, height, id = box
             flipped_x_center = 1.0 - x_center
             temp_box.append([flipped_x_center, y_center, width, height, id])
-    if np.random.random() > 0.5:
-        pass
 
     boxes = np.array(temp_box)
     return image, boxes
@@ -210,7 +216,7 @@ def datagenerator():
         img = cv2.imread(path_image)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = cv2.resize(img, (416, 416)) / 255.0
-        img, boxes = data_agrument(img, boxes)
+        img, boxes = data_agrument_flip(img, boxes)
         head13, head26, head52 = encode_boxes(boxes)
         yield np.array(img), (np.array(head13,dtype=np.float32), np.array(head26,dtype=np.float32), np.array(head52,dtype=np.float32))
 
