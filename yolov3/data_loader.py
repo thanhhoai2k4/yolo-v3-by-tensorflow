@@ -279,12 +279,13 @@ def datagenerator():
         path_image, boxes = parse_xml(xml)
         img = cv2.imread(path_image)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        img = cv2.resize(img, (416, 416)) / 255.0
         img, boxes = data_agrument_flip(img, boxes)
         # ---- doan code de scale
         if np.random.random() > 0.5:
             scale_factor = np.random.uniform(low=0.2, high=1.8, size=None) # None thi tra ve scalar
-            img, new_boxes = scale_image_and_boxes(img, boxes, scale_factor)
+            img, boxes = scale_image_and_boxes(img, boxes, scale_factor)
+        else:
+            img = cv2.resize(img, (416, 416)) / 255.0
         head13, head26, head52 = encode_boxes(boxes)
         yield np.array(img), (np.array(head13,dtype=np.float32), np.array(head26,dtype=np.float32), np.array(head52,dtype=np.float32))
 
