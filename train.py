@@ -4,7 +4,7 @@ import tensorflow as tf
 from yolov3.losses import getloss
 from tensorflow.keras.callbacks import ReduceLROnPlateau
 from yolov3.config import batch_size, epochs, anchors, num_class, step_per_epoch, step_per_val, checkpoint_path
-
+from tensorflow.keras.optimizers.schedules import CosineDecay
 
 
 try:
@@ -14,7 +14,15 @@ except:
     yolo_model = create_yolo_v3()
     print("create a new model yolo v3 !")
 
-optimizer = tf.keras.optimizers.Adam(0.001)
+initial_learning_rate = 0.001
+decay_steps = epochs * step_per_epoch
+cosine_decay_schedule = CosineDecay(
+    initial_learning_rate=initial_learning_rate,
+    decay_steps=decay_steps,
+    alpha=0.0
+)
+
+optimizer = tf.keras.optimizers.Adam(learning_rate=cosine_decay_schedule)
 yolo_model.compile(optimizer=optimizer, loss=[getloss(num_class, anchors[0]),
                                               getloss(num_class,anchors[1]),
                                               getloss(num_class,anchors[2])], run_eagerly=False)
@@ -48,14 +56,6 @@ dataset_val = dataset_val.batch(batch_size)
 dataset_val = dataset_val.prefetch(tf.data.experimental.AUTOTUNE)
 
 
-reduce_lr_callback = ReduceLROnPlateau(
-    monitor='val_loss',
-    factor=0.2,
-    patience=2,
-    min_lr=0.00001,
-    verbose=1
-)
-
 model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
     filepath=checkpoint_path,
     monitor='val_loss',
@@ -68,4 +68,4 @@ model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
 
 yolo_model.fit(dataset_train, epochs=epochs, steps_per_epoch=step_per_epoch,
                validation_data=dataset_val, validation_steps=step_per_val,
-               callbacks=[reduce_lr_callback, model_checkpoint_callback])
+               callbacks=[model_checkpoint_callback])
