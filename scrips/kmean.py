@@ -3,7 +3,7 @@ import numpy as np
 import xml.etree.ElementTree as ET
 from tqdm import tqdm
 
-ANNOTATIONS_PATH  =  "data/annotations"
+ANNOTATIONS_PATH  = "../data/annotations"
 NUM_CLUSTERS = 9
 NETWORK_INPUT_SIZE = 416
 

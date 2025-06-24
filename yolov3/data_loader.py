@@ -123,7 +123,7 @@ def sigmoid(x):
 
 # ... (giữ nguyên các hàm và biến ở đầu file data_loader.py)
 
-def encode_boxes(path_image: str, boxes: np.ndarray, grid_size_list: list[int, int, int] = [13, 26, 52],
+def encode_boxes(boxes: np.ndarray, grid_size_list: list[int, int, int] = [13, 26, 52],
                  number_class: int = 3):
     # Khởi tạo các mảng y_true cho mỗi đầu ra (head)
     y_true_13 = np.zeros((grid_size_list[0], grid_size_list[0], 3, 5 + number_class), dtype=np.float32)
@@ -186,13 +186,32 @@ def encode_boxes(path_image: str, boxes: np.ndarray, grid_size_list: list[int, i
 
     return y_true_13, y_true_26, y_true_52
 
+
+def data_agrument(image, boxes):
+
+
+    if np.random.random() > 0.5:
+        image = np.fliplr(image,axis = 1)
+        temp_box = []
+        for box in boxes:
+
+            x_center, y_center, width, height, id = box
+            flipped_x_center = 1.0 - x_center
+            temp_box.append([flipped_x_center, y_center, width, height, id])
+    if np.random.random() > 0.5:
+        pass
+
+    boxes = np.array(temp_box)
+    return image, boxes
+
 def datagenerator():
     for xml in xml_list:
         path_image, boxes = parse_xml(xml)
-        head13, head26, head52 = encode_boxes(path_image, boxes)
         img = cv2.imread(path_image)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = cv2.resize(img, (416, 416)) / 255.0
+        img, boxes = data_agrument(img, boxes)
+        head13, head26, head52 = encode_boxes(boxes)
         yield np.array(img), (np.array(head13,dtype=np.float32), np.array(head26,dtype=np.float32), np.array(head52,dtype=np.float32))
 
 def datagenerator_cache():
@@ -202,7 +221,7 @@ def datagenerator_cache():
     head52s = []
     for xml in xml_list:
         path_image, boxes = parse_xml(xml)
-        head13, head26, head52 = encode_boxes(path_image, boxes)
+        head13, head26, head52 = encode_boxes(boxes)
         img = cv2.imread(path_image)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = cv2.resize(img, (416, 416)) / 255.0
@@ -218,7 +237,7 @@ def datagenerator_cache():
 def datagenerator_val():
     for xml in xml_list_val:
         path_image, boxes = parse_xml(xml,False)
-        head13, head26, head52 = encode_boxes(path_image, boxes)
+        head13, head26, head52 = encode_boxes(boxes)
         img = cv2.imread(path_image)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = cv2.resize(img, (416, 416)) / 255.0
