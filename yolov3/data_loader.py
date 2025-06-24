@@ -205,8 +205,8 @@ def scale_image_and_boxes(image, boxes, scale_factor):
 
     resized_image = cv2.resize(image, (new_w, new_h))
 
-    # tao 1 cai nen mau xam 128
-    canvas = np.full(shape=(h,w,3), fill_value=128, dtype=np.uint8)
+    # tao 1 cai nen mau xam 128/255.0
+    canvas = np.full(shape=(h,w,3), fill_value=128.0/255.0, dtype=np.float32)
 
     x_offset = (w-new_w)//2
     y_offset = (h-new_h)//2
