@@ -186,6 +186,71 @@ def encode_boxes(boxes: np.ndarray, grid_size_list: list[int, int, int] = [13, 2
 
     return y_true_13, y_true_26, y_true_52
 
+def scale_image_and_boxes(image, boxes, scale_factor):
+    """
+    Args:
+        image: anh width, width, 3
+        boxes: n,4
+        scale_factor:  ti le scale >0
+
+    Returns: tra ve 1 anh va box tuong ung duoc scale.
+
+    """
+    # kich thuoc cu
+    (h, w) = image.shape[:2]
+
+    # kich thuoc moi
+    new_w = int(w*scale_factor)
+    new_h = int(h*scale_factor)
+
+    resized_image = cv2.resize(image, (new_w, new_h))
+
+    # tao 1 cai nen mau xam 128
+    canvas = np.full(shape=(h,w,3), fill_value=128, dtype=np.uint8)
+
+    x_offset = (w-new_w)//2
+    y_offset = (h-new_h)//2
+
+    if scale_factor < 1.0:
+        canvas[y_offset:y_offset + new_h, x_offset:x_offset + new_w] = resized_image
+        final_image = canvas
+    else:
+        final_image = resized_image[abs(y_offset):abs(y_offset) + h, abs(x_offset):abs(x_offset) + w]
+
+    # Su ly image thanh cong
+
+    new_boxes = []
+    if len(boxes) > 0:
+        for box in boxes:
+            x_center, y_center, width, height, class_id = box # dang o dang chuan hoa
+
+            new_box_w = width * scale_factor  # widht moi
+            new_box_h = height * scale_factor #height moi
+
+            new_x_center = (x_center * scale_factor) + (x_offset / w)
+            new_y_center = (y_center * scale_factor) + (y_offset / h)
+
+            # --- KIỂM TRA TÍNH HỢP LỆ CỦA BOX MỚI ---
+            # Chuyển đổi box mới về dạng (xmin, ymin, xmax, ymax) để dễ tính toán.
+            xmin = new_x_center - new_box_w / 2
+            ymin = new_y_center - new_box_h / 2
+            xmax = new_x_center + new_box_w / 2
+            ymax = new_y_center + new_box_h / 2
+
+            # Rất quan trọng khi phóng to, vì một phần box có thể bị cắt mất.
+            xmin = max(0.0, xmin)
+            ymin = max(0.0, ymin)
+            xmax = min(1.0, xmax)
+            ymax = min(1.0, ymax)
+
+            if xmax > xmin and ymax > ymin:
+                final_x_center = (xmin + xmax) / 2
+                final_y_center = (ymin + ymax) / 2
+                final_width = xmax - xmin
+                final_height = ymax - ymin
+                new_boxes.append([final_x_center, final_y_center, final_width, final_height, class_id])
+
+    return cv2.resize(final_image, (416, 416)), np.array(new_boxes, dtype=np.float32)
 
 def data_agrument_flip(image, boxes):
     """
@@ -216,6 +281,10 @@ def datagenerator():
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = cv2.resize(img, (416, 416)) / 255.0
         img, boxes = data_agrument_flip(img, boxes)
+        # ---- doan code de scale
+        if np.random.random() > 0.5:
+            scale_factor = np.random.uniform(low=0.2, high=1.8, size=None) # None thi tra ve scalar
+            img, new_boxes = scale_image_and_boxes(img, boxes, scale_factor)
         head13, head26, head52 = encode_boxes(boxes)
         yield np.array(img), (np.array(head13,dtype=np.float32), np.array(head26,dtype=np.float32), np.array(head52,dtype=np.float32))
 
