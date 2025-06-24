@@ -198,14 +198,15 @@ def data_agrument_flip(image, boxes):
     Returns: image boxes
 
     """
-    temp_box = []
     if np.random.random() > 0.5:
+        temp_box = []
         image = np.flip(image, 1)
         for box in boxes:
             x_center, y_center, width, height, id = box
             flipped_x_center = 1.0 - x_center
             temp_box.append([flipped_x_center, y_center, width, height, id])
-    boxes = np.array(temp_box)
+
+        return image, np.array(temp_box)
     return image, boxes
 
 def datagenerator():
