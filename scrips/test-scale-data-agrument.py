@@ -15,7 +15,7 @@ def scale_image_and_boxes(image, boxes, scale_factor):
     resized_image = cv2.resize(image, (new_w, new_h))
 
     # tao 1 cai nen mau xam 128
-    canvas = np.full(shape=(h,w,3), fill_value=128, dtype=np.uint8)
+    canvas = np.full(shape=(h,w,3), fill_value=128.0 / 255.0, dtype=np.float32)
 
     x_offset = (w-new_w)//2
     y_offset = (h-new_h)//2
@@ -136,11 +136,11 @@ def show_image_with_boxes_cv2(image, boxes, window_name="Image with Boxes"):
     cv2.destroyAllWindows()
 
 
-final_image = cv2.imread("../data/images/maksssksksss0.png")
+final_image = cv2.imread("../data/images/maksssksksss0.png")/ 255.0
 boxes = np.array([
     [76.37, 140, 24.3,42, 0],
     [167, 128.7, 33.3,50, 0],
 ])/ 416
 
-final_image, boxes = scale_image_and_boxes(final_image, boxes, 1.8)
+final_image, boxes = scale_image_and_boxes(final_image, boxes, 0.8)
 show_image_with_boxes_cv2(final_image, boxes)
