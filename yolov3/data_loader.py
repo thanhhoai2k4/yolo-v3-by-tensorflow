@@ -199,14 +199,12 @@ def data_agrument_flip(image, boxes):
 
     """
     temp_box = []
-    image = image
     if np.random.random() > 0.5:
-        for box in boxes:
         image = np.flip(image, 1)
-        x_center, y_center, width, height, id = box
-        flipped_x_center = 1.0 - x_center
-        temp_box.append([flipped_x_center, y_center, width, height, id])
-
+        for box in boxes:
+            x_center, y_center, width, height, id = box
+            flipped_x_center = 1.0 - x_center
+            temp_box.append([flipped_x_center, y_center, width, height, id])
     boxes = np.array(temp_box)
     return image, boxes
 
