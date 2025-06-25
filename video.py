@@ -3,15 +3,13 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 from yolov3.yolo_v3_model import decode_predictions
-from yolov3.config import anchors, num_class, class_mapping_decoder
+from yolov3.config import anchors, num_class, class_mapping_decoder, checkpoint_path, image_width, image_height
 import os
 
-# --- TÙY CHỈNH CÁC THAM SỐ ---
-MODEL_PATH = 'model.h5'
-VIDEO_PATH = 'RESULT/video/video.mp4'  # <<< THAY ĐƯỜNG DẪN ĐẾN VIDEO CỦA BẠN
-OUTPUT_PATH = 'RESULT/video/videoresult.mp4'  # <<< ĐƯỜNG DẪN LƯU VIDEO KẾT QUẢ
-MODEL_INPUT_WIDTH = 416
-MODEL_INPUT_HEIGHT = 416
+VIDEO_PATH = 'RESULT/video/video.mp4'
+OUTPUT_PATH = 'RESULT/video/videoresult.mp4'
+MODEL_INPUT_WIDTH = image_width
+MODEL_INPUT_HEIGHT = image_height
 
 ### MỚI ###
 # Thiết lập khoảng thời gian detection. Ví dụ: 10 nghĩa là cứ 10 frame mới detect một lần.
@@ -25,7 +23,7 @@ def inference_XXXX(frame, num_classes, model):
     img = frame
     grid_size = [13, 26, 52]
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    img = cv2.resize(img, (416, 416))/255.0
+    img = cv2.resize(img, (MODEL_INPUT_WIDTH, MODEL_INPUT_HEIGHT))/255.0
     img_expanded = np.expand_dims(img, axis=0)
     kq = model.predict(img_expanded)
 
@@ -76,7 +74,7 @@ def draw_predictions(frame, predictions, width_video_scale, height_video_scale):
 def main():
     try:
         print("Đang tải mô hình...")
-        model = load_model(MODEL_PATH)
+        model = load_model(checkpoint_path)
         print("Tải mô hình thành công!")
     except Exception as e:
         print(f"Lỗi khi tải mô hình: {e}")
@@ -121,5 +119,7 @@ def main():
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     cv2.destroyAllWindows()
+
+
 if __name__ == '__main__':
     main()
