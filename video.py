@@ -16,7 +16,7 @@ MODEL_INPUT_HEIGHT = 416
 ### MỚI ###
 # Thiết lập khoảng thời gian detection. Ví dụ: 10 nghĩa là cứ 10 frame mới detect một lần.
 # Bạn có thể tăng/giảm giá trị này để cân bằng giữa hiệu năng và độ chính xác.
-DETECTION_INTERVAL = 100
+DETECTION_INTERVAL = 10
 
 
 
@@ -44,29 +44,35 @@ def inference_XXXX(frame, num_classes, model):
     # luc nay all dang la 1 ds vs 3 phan tu
     # can noi tat ca cac phan tu cua ds trong ds
     all = np.array(all)
+    if all.shape[0] == 0:
+        return []
     nms = tf.image.non_max_suppression(
         boxes=all[..., 0:4], scores=all[...,4], max_output_size=20, iou_threshold=0.5
     )
-    for j in nms:
-        x,y,w,h = all[j][:4] * 416
-        c = np.round(all[j][4],2)
-        p = all[j][5:]
 
-        x = int(x)
-        y = int(y)
-        w = int(w)
-        h = int(h)
+    final_predictions = []
+    for index in nms:
+        prediction = all[index]
+        final_predictions.append(prediction)
+    return final_predictions
 
-        x_left = int(x - w/2)
-        y_top = int(y - h/2)
-        x_right = int(x + w/2)
-        y_bottom = int(y + h/2)
-
+def draw_predictions(frame, predictions, width_video_scale, height_video_scale):
+    for row in predictions:
+        x,y,w,h = row[:4] * MODEL_INPUT_WIDTH
+        c = row[4]
+        p = row[5:]
+        xmin = int((x - w/2)*width_video_scale)
+        ymin = int((y - h/2)*height_video_scale)
+        xmax = int((x + w/2)*width_video_scale)
+        ymax = int((y + h/2)*height_video_scale)
         nameclass = class_mapping_decoder[np.argmax(p)]
 
-        cv2.rectangle(img, (x_left,y_top), (x_right,y_bottom), (0,255,0), 2)
-        cv2.putText(img, nameclass+" : " + str(c), (x_left, y_top), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-    return img
+
+        cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
+        cv2.putText(frame, nameclass+ " : " + str(c), (xmin, ymin), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+    return frame
+
+
 def main():
     try:
         print("Đang tải mô hình...")
@@ -83,24 +89,34 @@ def main():
         return
 
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
+    input_fps = cap.get(cv2.CAP_PROP_FPS)
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    width_video = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height_video = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    out = cv2.VideoWriter(OUTPUT_PATH, fourcc, input_fps, (width_video, height_video))
 
-
+    width_video_scale = width_video / MODEL_INPUT_WIDTH
+    height_video_scale = height_video / MODEL_INPUT_HEIGHT
     frame_count = 0
     last_predictions = None
 
     while True:
         ret , frame = cap.read()
-        frame = cv2.resize(frame, (MODEL_INPUT_WIDTH, MODEL_INPUT_HEIGHT))
+
         if not ret:
             print("Kết thúc video.")
             break
 
         if (frame_count % DETECTION_INTERVAL) == 0:
-            frame = inference_XXXX(frame, num_class, model)
-            last_predictions = frame
+            final_predictions = inference_XXXX(frame, num_class, model)
+            last_predictions = final_predictions
+            frame = draw_predictions(frame, final_predictions, width_video_scale, height_video_scale)
+        else:
+            frame = draw_predictions(frame, last_predictions, width_video_scale, height_video_scale)
 
 
         frame_count += 1
+        out.write(frame)
         cv2.imshow('frame', frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
