@@ -12,7 +12,7 @@ epochs = 100
 anchors = np.array([[[40, 44], [59, 64], [103, 124]],
                     [[18, 25], [24, 25], [30, 33]],
                     [[7, 8], [11, 12], [15, 17]]],
-                   dtype=np.float32) / 416
+                   dtype=np.float32) / image_width
 
 class_ids = ["mask_weared_incorrect", "without_mask","with_mask"]
 class_mapping_decoder = dict(zip( range(len(class_ids)), class_ids ))
