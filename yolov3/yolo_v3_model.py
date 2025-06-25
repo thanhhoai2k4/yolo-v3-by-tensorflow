@@ -174,7 +174,7 @@ def decode_predictions(y_pred, anchors, grid_size, num_classes=3):
 
 
 def inference(path, num_classes, model):
-
+    import os
     grid_size = [13, 26, 52]
     img = cv2.imread(path)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -220,6 +220,13 @@ def inference(path, num_classes, model):
         cv2.rectangle(img, (x_left,y_top), (x_right,y_bottom), (0,255,0), 2)
         cv2.putText(img, nameclass+" : " + str(c), (x_left, y_top), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
+    try:
+        filename = os.path.basename(path)
+        ten_file, phan_mo_rong = os.path.splitext(filename)
+        cv2.imwrite("RESULT/" + ten_file + ".png", (img*255.0).astype(np.uint8))
+        print("save image access in "+ "RESULT/" + ten_file + ".png")
+    except:
+        pass
 
     cv2.imshow('anh', img)
     cv2.waitKey(0)
