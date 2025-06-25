@@ -182,37 +182,43 @@ def inference(path, num_classes, model):
     img_expanded = np.expand_dims(img, axis=0)
     kq = model.predict(img_expanded)
 
-
+    all = []
     for i in range(3):
         ac = anchors[i].reshape(-1,2)
         decoded_preds = decode_predictions(kq[i], ac, grid_size[i], num_classes)[0]
         confidences = decoded_preds[..., 4]
-        mask = confidences >= 0.8
+        mask = confidences >= 0.6
         decoded_preds = decoded_preds[mask]
         scores = confidences[mask]
 
-        nms = tf.image.non_max_suppression(
-            boxes=decoded_preds[...,0:4], scores=scores, max_output_size=20, iou_threshold=0.5
-        )
-        for j in nms:
-            x,y,w,h = decoded_preds[j][:4] * 416
-            c = decoded_preds[j][4]
-            p = decoded_preds[j][5:]
+        for row in decoded_preds:
+            all.append(row)
 
-            x = int(x)
-            y = int(y)
-            w = int(w)
-            h = int(h)
+    # luc nay all dang la 1 ds vs 3 phan tu
+    # can noi tat ca cac phan tu cua ds trong ds
+    all = np.array(all)
+    nms = tf.image.non_max_suppression(
+        boxes=all[..., 0:4], scores=all[...,4], max_output_size=20, iou_threshold=0.5
+    )
+    for j in nms:
+        x,y,w,h = all[j][:4] * 416
+        c = np.round(all[j][4],2)
+        p = all[j][5:]
 
-            x_left = int(x - w/2)
-            y_top = int(y - h/2)
-            x_right = int(x + w/2)
-            y_bottom = int(y + h/2)
+        x = int(x)
+        y = int(y)
+        w = int(w)
+        h = int(h)
 
-            nameclass = class_mapping_decoder[np.argmax(p)]
+        x_left = int(x - w/2)
+        y_top = int(y - h/2)
+        x_right = int(x + w/2)
+        y_bottom = int(y + h/2)
 
-            cv2.rectangle(img, (x_left,y_top), (x_right,y_bottom), (0,255,0), 2)
-            cv2.putText(img, nameclass, (x_left, y_top), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+        nameclass = class_mapping_decoder[np.argmax(p)]
+
+        cv2.rectangle(img, (x_left,y_top), (x_right,y_bottom), (0,255,0), 2)
+        cv2.putText(img, nameclass+" : " + str(c), (x_left, y_top), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
 
     cv2.imshow('anh', img)
