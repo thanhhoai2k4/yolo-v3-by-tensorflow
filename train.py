@@ -32,9 +32,9 @@ dataset_train = tf.data.Dataset.from_generator(
     output_signature=(
         tf.TensorSpec(shape=(416, 416, 3), dtype=tf.float32),  # Đầu vào X_batch image
         (
-            tf.TensorSpec(shape=(13, 13, 3, 8), dtype=tf.float32),  # head 1
-            tf.TensorSpec(shape=(26, 26, 3, 8), dtype=tf.float32),  # head 2
-            tf.TensorSpec(shape=(52, 52, 3, 8), dtype=tf.float32)  # head 3
+            tf.TensorSpec(shape=(13, 13, 3, 5+num_class), dtype=tf.float32),  # head 1
+            tf.TensorSpec(shape=(26, 26, 3, 5+num_class), dtype=tf.float32),  # head 2
+            tf.TensorSpec(shape=(52, 52, 3, 5+num_class), dtype=tf.float32)  # head 3
         )))
 
 dataset_train = dataset_train.shuffle(batch_size * 4)

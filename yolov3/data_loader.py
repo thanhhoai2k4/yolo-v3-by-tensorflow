@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import cv2
-from yolov3.config import anchors, class_ids, class_mapping_decoder, class_mapping_encoder
+from yolov3.config import anchors, class_ids, class_mapping_decoder, class_mapping_encoder, num_class
 
 xml_list = os.listdir("data/annotations") # lay danh sach cac file xml
 xml_list = [os.path.join(os.getcwd(),"data/annotations",xml) for xml in xml_list]
@@ -124,7 +124,7 @@ def sigmoid(x):
 # ... (giữ nguyên các hàm và biến ở đầu file data_loader.py)
 
 def encode_boxes(boxes: np.ndarray, grid_size_list: list[int, int, int] = [13, 26, 52],
-                 number_class: int = 3):
+                 number_class: int = 2):
     # Khởi tạo các mảng y_true cho mỗi đầu ra (head)
     y_true_13 = np.zeros((grid_size_list[0], grid_size_list[0], 3, 5 + number_class), dtype=np.float32)
     y_true_26 = np.zeros((grid_size_list[1], grid_size_list[1], 3, 5 + number_class), dtype=np.float32)
@@ -286,7 +286,7 @@ def datagenerator():
             img, boxes = scale_image_and_boxes(img, boxes, scale_factor)
         else:
             img = cv2.resize(img, (416, 416))
-        head13, head26, head52 = encode_boxes(boxes)
+        head13, head26, head52 = encode_boxes(boxes, number_class=num_class)
         yield np.array(img), (np.array(head13,dtype=np.float32), np.array(head26,dtype=np.float32), np.array(head52,dtype=np.float32))
 
 def datagenerator_cache():
@@ -296,7 +296,7 @@ def datagenerator_cache():
     head52s = []
     for xml in xml_list:
         path_image, boxes = parse_xml(xml)
-        head13, head26, head52 = encode_boxes(boxes)
+        head13, head26, head52 = encode_boxes(boxes, number_class=num_class)
         img = cv2.imread(path_image)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = cv2.resize(img, (416, 416)) / 255.0
@@ -312,7 +312,7 @@ def datagenerator_cache():
 def datagenerator_val():
     for xml in xml_list_val:
         path_image, boxes = parse_xml(xml,False)
-        head13, head26, head52 = encode_boxes(boxes)
+        head13, head26, head52 = encode_boxes(boxes, number_class=num_class)
         img = cv2.imread(path_image)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = cv2.resize(img, (416, 416)) / 255.0
