@@ -1,7 +1,7 @@
 import numpy as np
 import os
 
-num_class = 3
+num_class = 2
 checkpoint_path = "model.h5"
 
 image_width = 416
