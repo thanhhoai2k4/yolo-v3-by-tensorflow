@@ -2,11 +2,7 @@
 import cv2
 import tensorflow as tf
 import numpy as np
-from yolov3.config import anchors
-
-class_ids = ["mask_weared_incorrect", "without_mask","with_mask"]
-class_mapping_decoder = dict(zip( range(len(class_ids)), class_ids ))
-class_mapping_encoder = dict(zip(class_ids, range(len(class_ids))))
+from yolov3.config import anchors, class_ids, class_mapping_decoder, class_mapping_encoder, image_width, image_height, num_class
 
 
 def conv_bn_leaky(x, filters, kernel_size, strides=1, activation=True, bn = True):
@@ -83,13 +79,13 @@ def yoloBlock(x, filters):
     return x
 
 def create_yolo_v3():
-    backbone = darknet53(input_shape=(416,416,3))
+    backbone = darknet53(input_shape=(image_width,image_height,3))
     inputs = backbone.inputs
     head52, head26, head13 = backbone.outputs
 
     x = yoloBlock(head13, 512)
     head13 = conv_bn_leaky(x, 1024, 3, 1)
-    head13 = conv_bn_leaky(head13, 24, 1, 1,False, False)
+    head13 = conv_bn_leaky(head13, (5+num_class)*3, 1, 1,False, False)
 
     x = conv_bn_leaky(x, 256,1,1)
     x = tf.keras.layers.UpSampling2D(size=(2, 2), data_format="channels_last", interpolation='nearest')(x)
@@ -98,7 +94,7 @@ def create_yolo_v3():
 
     x = yoloBlock(x, 256)
     head26 = conv_bn_leaky(x, 512, 3, 1)
-    head26 = conv_bn_leaky(head26,24,1,1, False, False)
+    head26 = conv_bn_leaky(head26,(5+num_class)*3,1,1, False, False)
 
 
     x = conv_bn_leaky(x, 128,1,1)
@@ -107,7 +103,7 @@ def create_yolo_v3():
 
     x = yoloBlock(x, 128)
     head52 = conv_bn_leaky(x, 256, 3,1)
-    head52 = conv_bn_leaky(head52,24,1,1, False, False)
+    head52 = conv_bn_leaky(head52,(5+num_class)*3,1,1, False, False)
 
     model = tf.keras.Model(inputs, [head13, head26, head52])
     return model
