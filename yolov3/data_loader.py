@@ -344,7 +344,7 @@ def rotate_image_and_boxes(image, angle, boxes):
         return rotated_image, np.array([])
 
     new_boxes = np.array(valid_new_boxes)# xyxy
-    final_xywh = box_corner_to_center(new_boxes) #xywh
+    final_xywh = box_corner_to_center(new_boxes.reshape(-1,4)) #xywh
     final_ids = np.array(valid_ids)
     rows = np.concatenate([final_xywh, final_ids], axis=1)
 
