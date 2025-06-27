@@ -176,8 +176,8 @@ def encode_boxes(boxes: np.ndarray, grid_size_list: list[int, int, int] = [13, 2
         # Tính toán các giá trị target (tx, ty, tw, th)
         tx = grid_size * box[0] - grid_x
         ty = grid_size * box[1] - grid_y
-        tw = np.log(box[2] / selected_anchor_wh[0])
-        th = np.log(box[3] / selected_anchor_wh[1])
+        tw = np.log(box[2] / selected_anchor_wh[0] + 1e-6)
+        th = np.log(box[3] / selected_anchor_wh[1] + 1e-6)
 
         # Gán giá trị vào mảng y_true tương ứng
         y_true[grid_y, grid_x, anchor_index_in_scale, 0:4] = [tx, ty, tw, th]
@@ -308,11 +308,11 @@ def rotate_image_and_boxes(image, angle, boxes):
         x_min, y_min, x_max, y_max = box
         # Lấy tọa độ 4 góc của bounding box
         corners = np.array([
-            [x_min, y_min],
-            [x_max, y_min],
-            [x_max, y_max],
-            [x_min, y_max]
-        ])*image_width
+            [x_min*w, y_min*h],
+            [x_max*w, y_min*h],
+            [x_max*w, y_max*h],
+            [x_min*w, y_max*h]
+        ])
 
         # Thêm 1 vào cuối để thực hiện phép nhân ma trận
         ones = np.ones(shape=(len(corners), 1))
@@ -333,9 +333,9 @@ def rotate_image_and_boxes(image, angle, boxes):
         new_x_max = min(w, new_x_max)
         new_y_max = min(h, new_y_max)
 
-        new_boxes.append([new_x_min, new_y_min, new_x_max, new_y_max])
+        new_boxes.append([new_x_min/w, new_y_min/h, new_x_max/w, new_y_max/h])
 
-    new_boxes = np.array(new_boxes) / image_width
+    new_boxes = np.array(new_boxes)
     new_boxes = box_corner_to_center(new_boxes)
     rows = np.concatenate([new_boxes, ids], axis=1)
     return rotated_image, rows
@@ -354,7 +354,8 @@ def datagenerator():
             img, boxes = scale_image_and_boxes(img, boxes, scale_factor)
         # ---- xoay anh
         if np.random.random() > 0.5:
-            img,boxes = rotate_image_and_boxes(img, 20, boxes)
+            angle = 20
+            img,boxes = rotate_image_and_boxes(img, angle, boxes)
 
         img = cv2.resize(img, (416, 416)) / 255.0
         head13, head26, head52 = encode_boxes(boxes, number_class=num_class)
