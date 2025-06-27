@@ -374,8 +374,8 @@ def translate_normalized_yolo(image, bboxes, max_translate_ratio=0.1):
 
     # 1. Tính toán khoảng cách dịch chuyển THEO TỶ LỆ (normalized)
     # tx, ty bây giờ là các giá trị trong khoảng [-max_translate_ratio, max_translate_ratio]
-    tx = random.random.uniform(-max_translate_ratio, max_translate_ratio)
-    ty = random.random.uniform(-max_translate_ratio, max_translate_ratio)
+    tx = random.uniform(-max_translate_ratio, max_translate_ratio)
+    ty = random.uniform(-max_translate_ratio, max_translate_ratio)
 
     # 2. Tạo ma trận biến đổi affine
     # Phải nhân tx, ty với kích thước ảnh thực tế để cv2.warpAffine hiểu

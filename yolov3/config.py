@@ -1,7 +1,7 @@
 import numpy as np
 import os
 
-num_class = 2
+
 checkpoint_path = "model.h5"
 
 image_width = 416
@@ -15,6 +15,7 @@ anchors = np.array([[[40, 44], [59, 64], [103, 124]],
                    dtype=np.float32) / image_width
 
 class_ids = ["without_mask","with_mask"]
+num_class = len(class_ids)
 class_mapping_decoder = dict(zip( range(len(class_ids)), class_ids ))
 class_mapping_encoder = dict(zip(class_ids, range(len(class_ids))))
 
