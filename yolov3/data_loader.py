@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import cv2
-from yolov3.config import anchors, class_ids, class_mapping_decoder, class_mapping_encoder, num_class
+from yolov3.config import anchors, class_ids, class_mapping_decoder, class_mapping_encoder, num_class, image_width, image_height
 
 xml_list = os.listdir("data/annotations") # lay danh sach cac file xml
 xml_list = [os.path.join(os.getcwd(),"data/annotations",xml) for xml in xml_list]
@@ -250,7 +250,7 @@ def scale_image_and_boxes(image, boxes, scale_factor):
                 final_height = ymax - ymin
                 new_boxes.append([final_x_center, final_y_center, final_width, final_height, class_id])
 
-    return cv2.resize(final_image, (416, 416)), np.array(new_boxes, dtype=np.float32)
+    return final_image, np.array(new_boxes, dtype=np.float32)
 
 def data_agrument_flip(image, boxes):
     """
@@ -274,18 +274,89 @@ def data_agrument_flip(image, boxes):
         return image, np.array(temp_box)
     return image, boxes
 
+def rotate_image_and_boxes(image, angle, boxes):
+    """
+    Xoay ảnh và các bounding box tương ứng.
+
+    Args:
+        image (np.array): Ảnh đầu vào (H, W, C).
+        angle (float): Góc xoay (đơn vị: độ).
+        boxes (list): Danh sách các bounding box, mỗi box có dạng [x_center, y_center, width, height].
+
+    Returns:
+        rotated_image: Ảnh đã xoay.
+        new_boxes: Danh sách các bounding box mới.
+    """
+
+    ids = boxes[...,4:5]
+    boxes = boxes[...,0:4]
+    boxes = box_center_to_corner(boxes)
+
+    # Lấy kích thước ảnh
+    h, w = image.shape[:2]
+    # Lấy tâm xoay
+    center = (w // 2, h // 2)
+
+    # 1. Tạo ma trận xoay
+    M = cv2.getRotationMatrix2D(center, angle, 1.0)
+
+    # 2. Xoay ảnh
+    rotated_image = cv2.warpAffine(image, M, (w, h))
+
+    new_boxes = []
+    for box in boxes:
+        x_min, y_min, x_max, y_max = box
+        # Lấy tọa độ 4 góc của bounding box
+        corners = np.array([
+            [x_min, y_min],
+            [x_max, y_min],
+            [x_max, y_max],
+            [x_min, y_max]
+        ])*image_width
+
+        # Thêm 1 vào cuối để thực hiện phép nhân ma trận
+        ones = np.ones(shape=(len(corners), 1))
+        points_ones = np.hstack([corners, ones])
+
+        # 3. Xoay tọa độ các góc
+        transformed_points = M.dot(points_ones.T).T
+
+        # 4. Tìm bounding box mới bao trọn các góc đã xoay
+        new_x_min = min(transformed_points[:, 0])
+        new_y_min = min(transformed_points[:, 1])
+        new_x_max = max(transformed_points[:, 0])
+        new_y_max = max(transformed_points[:, 1])
+
+        # Đảm bảo bounding box không vượt ra ngoài ảnh
+        new_x_min = max(0, new_x_min)
+        new_y_min = max(0, new_y_min)
+        new_x_max = min(w, new_x_max)
+        new_y_max = min(h, new_y_max)
+
+        new_boxes.append([new_x_min, new_y_min, new_x_max, new_y_max])
+
+    new_boxes = np.array(new_boxes) / image_width
+    new_boxes = box_corner_to_center(new_boxes)
+    rows = np.concatenate([new_boxes, ids], axis=1)
+    return rotated_image, rows
+
 def datagenerator():
     for xml in xml_list:
         path_image, boxes = parse_xml(xml)
         img = cv2.imread(path_image)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB) / 255.0
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+        # lat anh theo chieu ngnang ti le 0.5
         img, boxes = data_agrument_flip(img, boxes)
         # ---- doan code de scale
         if np.random.random() > 0.5:
             scale_factor = np.random.uniform(low=0.2, high=1.8, size=None) # None thi tra ve scalar
             img, boxes = scale_image_and_boxes(img, boxes, scale_factor)
-        else:
-            img = cv2.resize(img, (416, 416))
+        # ---- xoay anh
+        if np.random.random() > 0.5:
+            img,boxes = rotate_image_and_boxes(img, 20, boxes)
+
+        img = cv2.resize(img, (416, 416)) / 255.0
         head13, head26, head52 = encode_boxes(boxes, number_class=num_class)
         yield np.array(img), (np.array(head13,dtype=np.float32), np.array(head26,dtype=np.float32), np.array(head52,dtype=np.float32))
 
