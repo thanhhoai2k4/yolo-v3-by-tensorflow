@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import cv2
+import random
 from yolov3.config import anchors, class_ids, class_mapping_decoder, class_mapping_encoder, num_class, image_width, image_height
 
 xml_list = os.listdir("data/annotations") # lay danh sach cac file xml
@@ -350,6 +351,76 @@ def rotate_image_and_boxes(image, angle, boxes):
 
     return rotated_image, rows
 
+# translate: dich chuyen
+def translate_normalized_yolo(image, bboxes, max_translate_ratio=0.1):
+    """
+    Thực hiện phép dịch chuyển ngẫu nhiên cho ảnh ĐÃ CHUẨN HÓA và các bounding box
+    ở định dạng YOLO ĐÃ CHUẨN HÓA [x_center, y_center, width, height].
+
+    Args:
+        image (np.array): Ảnh đầu vào đã chuẩn hóa (giá trị pixel từ 0 đến 1).
+        bboxes (list of lists): Danh sách các bounding box ở định dạng YOLO chuẩn hóa.
+        max_translate_ratio (float): Tỷ lệ dịch chuyển tối đa.
+
+    Returns:
+        tuple: (Ảnh đã dịch chuyển, danh sách các bounding box YOLO đã được cập nhật).
+    """
+    # Nếu không có bounding box nào thì không làm gì cả
+    if len(bboxes) == 0:
+        return image, bboxes
+
+    # Lấy chiều cao và chiều rộng pixel thực tế của ảnh
+    (height, width) = image.shape[:2]
+
+    # 1. Tính toán khoảng cách dịch chuyển THEO TỶ LỆ (normalized)
+    # tx, ty bây giờ là các giá trị trong khoảng [-max_translate_ratio, max_translate_ratio]
+    tx = random.random.uniform(-max_translate_ratio, max_translate_ratio)
+    ty = random.random.uniform(-max_translate_ratio, max_translate_ratio)
+
+    # 2. Tạo ma trận biến đổi affine
+    # Phải nhân tx, ty với kích thước ảnh thực tế để cv2.warpAffine hiểu
+    M = np.float32([[1, 0, tx * width],
+                    [0, 1, ty * height]])
+
+    # 3. Áp dụng phép dịch chuyển lên ảnh
+    translated_image = cv2.warpAffine(image, M, (width, height))
+
+    # 4. Cập nhật tọa độ cho các bounding box
+    updated_bboxes = []
+    for bbox in bboxes:
+        x_center, y_center, w, h, id = bbox
+
+        # Áp dụng trực tiếp phép dịch chuyển chuẩn hóa vào tâm của box
+        new_x_center = x_center + tx
+        new_y_center = y_center + ty
+
+        # 5. Xử lý các box bị dịch chuyển một phần hoặc hoàn toàn ra khỏi ảnh
+
+        # Chuyển từ xywh về xyxy để kiểm tra và cắt xén
+        x_min = new_x_center - w / 2
+        y_min = new_y_center - h / 2
+        x_max = x_min + w
+        y_max = y_min + h
+
+        # Ràng buộc tọa độ trong khoảng [0, 1]
+        clipped_x_min = np.clip(x_min, 0.0, 1.0)
+        clipped_y_min = np.clip(y_min, 0.0, 1.0)
+        clipped_x_max = np.clip(x_max, 0.0, 1.0)
+        clipped_y_max = np.clip(y_max, 0.0, 1.0)
+
+        # Tính lại width và height mới sau khi cắt xén
+        new_w = clipped_x_max - clipped_x_min
+        new_h = clipped_y_max - clipped_y_min
+
+        # Nếu box còn lại có diện tích > 0 thì mới giữ lại
+        if new_w > 0 and new_h > 0:
+            # Tính lại tâm mới và chuyển về định dạng YOLO
+            final_x_center = clipped_x_min + new_w / 2
+            final_y_center = clipped_y_min + new_h / 2
+            updated_bboxes.append([final_x_center, final_y_center, new_w, new_h, id])
+
+    return translated_image, updated_bboxes
+
 def datagenerator():
     for xml in xml_list:
         path_image, boxes = parse_xml(xml)
@@ -366,6 +437,10 @@ def datagenerator():
         if np.random.random() > 0.5:
             angle = 20
             img, boxes = rotate_image_and_boxes(img, angle, boxes)
+        # translate image: dich chuyen anh va boxes
+        if np.random.random() > 0.5:
+            img, boxes = translate_normalized_yolo(img, boxes,max_translate_ratio=0.2)
+
 
         img = cv2.resize(img, (416, 416)) / 255.0
         head13, head26, head52 = encode_boxes(boxes, number_class=num_class)
