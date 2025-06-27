@@ -290,7 +290,7 @@ def rotate_image_and_boxes(image, angle, boxes):
 
     ids = boxes[...,4:5]
     boxes = boxes[...,0:4] # xywh
-    boxes = box_center_to_corner(boxes) # xyxy
+    boxes = box_center_to_corner(boxes.reshape(-1,4)) # xyxy
 
     # Lấy kích thước ảnh
     h, w = image.shape[:2]
