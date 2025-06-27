@@ -62,7 +62,7 @@ def scale_image_and_boxes(image, boxes, scale_factor):
                 new_boxes.append([final_x_center, final_y_center, final_width, final_height, class_id])
 
     # Trả về ảnh cuối cùng và danh sách các box mới dưới dạng mảng NumPy.
-    return cv2.resize(final_image, (416, 416)), np.array(new_boxes, dtype=np.float32)
+    return final_image, np.array(new_boxes, dtype=np.float32)
 
 
 

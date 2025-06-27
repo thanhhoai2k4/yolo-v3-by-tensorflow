@@ -113,7 +113,7 @@ def rotate_image_and_boxes(image, angle, boxes):
     Args:
         image (np.array): Ảnh đầu vào (H, W, C).
         angle (float): Góc xoay (đơn vị: độ).
-        boxes (list): Danh sách các bounding box, mỗi box có dạng [x_center, y_center, width, height].
+        boxes (list): Danh sách các bounding box, mỗi box có dạng [x_center, y_center, width, height]. o dang chuan hoa
 
     Returns:
         rotated_image: Ảnh đã xoay.
@@ -121,8 +121,8 @@ def rotate_image_and_boxes(image, angle, boxes):
     """
 
     ids = boxes[...,4:5]
-    boxes = boxes[...,0:4]
-    boxes = box_center_to_corner(boxes)
+    boxes = boxes[...,0:4] # xywh
+    boxes = box_center_to_corner(boxes) # xyxy
 
     # Lấy kích thước ảnh
     h, w = image.shape[:2]
@@ -140,11 +140,11 @@ def rotate_image_and_boxes(image, angle, boxes):
         x_min, y_min, x_max, y_max = box
         # Lấy tọa độ 4 góc của bounding box
         corners = np.array([
-            [x_min, y_min],
-            [x_max, y_min],
-            [x_max, y_max],
-            [x_min, y_max]
-        ])*416
+            [x_min*w, y_min*h],
+            [x_max*w, y_min*h],
+            [x_max*w, y_max*h],
+            [x_min*w, y_max*h]
+        ])
 
         # Thêm 1 vào cuối để thực hiện phép nhân ma trận
         ones = np.ones(shape=(len(corners), 1))
@@ -165,9 +165,9 @@ def rotate_image_and_boxes(image, angle, boxes):
         new_x_max = min(w, new_x_max)
         new_y_max = min(h, new_y_max)
 
-        new_boxes.append([new_x_min, new_y_min, new_x_max, new_y_max])
+        new_boxes.append([new_x_min/w, new_y_min/h, new_x_max/w, new_y_max/h])
 
-    new_boxes = np.array(new_boxes) / 416
+    new_boxes = np.array(new_boxes)
     new_boxes = box_corner_to_center(new_boxes)
     rows = np.concatenate([new_boxes, ids], axis=1)
 
@@ -179,9 +179,8 @@ def rotate_image_and_boxes(image, angle, boxes):
 image = cv2.imread("../data/images/maksssksksss0.png")/ 255.0
 # Bounding box ban đầu (màu xanh)
 original_box = np.array([
-    [76.37, 140, 24.3,42, 0],
-    [167, 128.7, 33.3,50, 0]
-])/ 416 # xywh
+    [94/512, 123.5/366, 30/512,37/366 , 0],
+]) # xywh
 
 show_image_with_boxes_cv2(image, original_box)
 rotated_image, rows = rotate_image_and_boxes(image, 20, original_box)

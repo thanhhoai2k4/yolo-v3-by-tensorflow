@@ -281,7 +281,7 @@ def rotate_image_and_boxes(image, angle, boxes):
     Args:
         image (np.array): Ảnh đầu vào (H, W, C).
         angle (float): Góc xoay (đơn vị: độ).
-        boxes (list): Danh sách các bounding box, mỗi box có dạng [x_center, y_center, width, height].
+        boxes (list): Danh sách các bounding box, mỗi box có dạng [x_center, y_center, width, height]. o dang chuan hoa
 
     Returns:
         rotated_image: Ảnh đã xoay.
@@ -289,8 +289,8 @@ def rotate_image_and_boxes(image, angle, boxes):
     """
 
     ids = boxes[...,4:5]
-    boxes = boxes[...,0:4]
-    boxes = box_center_to_corner(boxes)
+    boxes = boxes[...,0:4] # xywh
+    boxes = box_center_to_corner(boxes) # xyxy
 
     # Lấy kích thước ảnh
     h, w = image.shape[:2]
@@ -338,6 +338,7 @@ def rotate_image_and_boxes(image, angle, boxes):
     new_boxes = np.array(new_boxes)
     new_boxes = box_corner_to_center(new_boxes)
     rows = np.concatenate([new_boxes, ids], axis=1)
+
     return rotated_image, rows
 
 def datagenerator():
