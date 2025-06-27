@@ -333,6 +333,9 @@ def rotate_image_and_boxes(image, angle, boxes):
         new_x_max = min(w, new_x_max)
         new_y_max = min(h, new_y_max)
 
+        if new_x_max - new_x_min < 10 or new_y_max - new_y_min < 10:
+            continue
+
         new_boxes.append([new_x_min/w, new_y_min/h, new_x_max/w, new_y_max/h])
 
     new_boxes = np.array(new_boxes)
