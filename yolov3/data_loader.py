@@ -303,8 +303,9 @@ def rotate_image_and_boxes(image, angle, boxes):
     # 2. Xoay ảnh
     rotated_image = cv2.warpAffine(image, M, (w, h))
 
-    new_boxes = []
-    for box in boxes:
+    valid_new_boxes = []
+    valid_ids = []
+    for i, box in enumerate(boxes):
         x_min, y_min, x_max, y_max = box
         # Lấy tọa độ 4 góc của bounding box
         corners = np.array([
@@ -336,11 +337,16 @@ def rotate_image_and_boxes(image, angle, boxes):
         if new_x_max - new_x_min < 10 or new_y_max - new_y_min < 10:
             continue
 
-        new_boxes.append([new_x_min/w, new_y_min/h, new_x_max/w, new_y_max/h])
+        valid_new_boxes.append([new_x_min / w, new_y_min / h, new_x_max / w, new_y_max / h])
+        valid_ids.append(ids[i])
+    # neu khong ton tai! boxes nao thi tra ve
+    if not valid_new_boxes:
+        return rotated_image, np.array([])
 
-    new_boxes = np.array(new_boxes)
-    new_boxes = box_corner_to_center(new_boxes)
-    rows = np.concatenate([new_boxes, ids], axis=1)
+    new_boxes = np.array(valid_new_boxes)# xyxy
+    final_xywh = box_corner_to_center(new_boxes) #xywh
+    final_ids = np.array(valid_ids)
+    rows = np.concatenate([final_xywh, final_ids], axis=1)
 
     return rotated_image, rows
 
@@ -359,7 +365,7 @@ def datagenerator():
         # ---- xoay anh
         if np.random.random() > 0.5:
             angle = 20
-            img,boxes = rotate_image_and_boxes(img, angle, boxes)
+            img, boxes = rotate_image_and_boxes(img, angle, boxes)
 
         img = cv2.resize(img, (416, 416)) / 255.0
         head13, head26, head52 = encode_boxes(boxes, number_class=num_class)

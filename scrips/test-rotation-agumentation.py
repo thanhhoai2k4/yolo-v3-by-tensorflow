@@ -164,6 +164,9 @@ def rotate_image_and_boxes(image, angle, boxes):
         new_y_min = max(0, new_y_min)
         new_x_max = min(w, new_x_max)
         new_y_max = min(h, new_y_max)
+        
+        if new_x_max - new_x_min < 10 or new_y_max - new_y_min < 10:
+            continue
 
         new_boxes.append([new_x_min/w, new_y_min/h, new_x_max/w, new_y_max/h])
 
@@ -179,7 +182,7 @@ def rotate_image_and_boxes(image, angle, boxes):
 image = cv2.imread("../data/images/maksssksksss0.png")/ 255.0
 # Bounding box ban đầu (màu xanh)
 original_box = np.array([
-    [94/512, 123.5/366, 30/512,37/366 , 0],
+    [500/512, 320/366, 30/512,37/366 , 0],
 ]) # xywh
 
 show_image_with_boxes_cv2(image, original_box)
