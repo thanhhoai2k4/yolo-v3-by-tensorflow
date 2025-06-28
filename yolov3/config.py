@@ -7,11 +7,11 @@ checkpoint_path = "model.h5"
 image_width = 416
 image_height = 416
 
-batch_size = 16
+batch_size = 2
 epochs = 100
-anchors = np.array([[[40, 44], [59, 64], [103, 124]],
-                    [[18, 25], [24, 25], [30, 33]],
-                    [[7, 8], [11, 12], [15, 17]]],
+anchors = np.array([[[132, 172], [197, 252], [344, 428]],
+                    [[52, 65], [68, 93], [96, 122]],
+                    [[12, 17], [23, 31], [35, 48]]],
                    dtype=np.float32) / image_width
 
 class_ids = ["Human face"]
