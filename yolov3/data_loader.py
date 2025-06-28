@@ -458,6 +458,8 @@ def datagenerator():
         head13, head26, head52 = encode_boxes(boxes, number_class=num_class)
         yield np.array(img), (np.array(head13,dtype=np.float32), np.array(head26,dtype=np.float32), np.array(head52,dtype=np.float32))
 
+
+
 def datagenerator_cache():
     imgs = []
     head13s = []
@@ -486,3 +488,35 @@ def datagenerator_val():
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = cv2.resize(img, (416, 416)) / 255.0
         yield np.array(img), (np.array(head13,dtype=np.float32), np.array(head26,dtype=np.float32), np.array(head52,dtype=np.float32))
+
+
+def datagenerator_test():
+    for xml in xml_list:
+        parsed_data  = parse_xml(xml)
+        if parsed_data is None:
+            print(f"Cảnh báo: Bỏ qua file annotation bị lỗi hoặc rỗng: {xml}")
+            continue
+
+
+        path_image, boxes = parsed_data
+        img = cv2.imread(path_image)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+        # lat anh theo chieu ngnang ti le 0.5
+        img, boxes = data_agrument_flip(img, boxes)
+        # ---- doan code de scale
+        if np.random.random() > 0.5:
+            scale_factor = np.random.uniform(low=0.2, high=1.8, size=None) # None thi tra ve scalar
+            img, boxes = scale_image_and_boxes(img, boxes, scale_factor)
+        # ---- xoay anh
+        if np.random.random() > 0.5:
+            angle = 20
+            img, boxes = rotate_image_and_boxes(img, angle, boxes)
+        # translate image: dich chuyen anh va boxes
+        if np.random.random() > 0.5:
+            img, boxes = translate_normalized_yolo(img, boxes,max_translate_ratio=0.2)
+
+
+        img = cv2.resize(img, (416, 416)) / 255.0
+        head13, head26, head52 = encode_boxes(boxes, number_class=num_class)
+        yield np.array(img), boxes

@@ -1,15 +1,11 @@
-import cv2
 from yolov3.data_loader import *
 from yolov3.config import class_mapping_decoder
 
 
-
-def showimage(path_xml):
-
-    path_img, boxes = parse_xml(path_xml)
+def showimage(img, boxes):
 
 
-    img = cv2.imread(path_img)
+
     height_image, width_image = img.shape[:2]
     for box in boxes:
         x_center, y_center, width, height, id = box
@@ -26,6 +22,5 @@ def showimage(path_xml):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-
-# showimage("data/annotations/4707554000891476.xml")
-# showimage("data/annotations/0445381710947770.xml")
+for img, boxes in datagenerator_test():
+    showimage(img,boxes)
