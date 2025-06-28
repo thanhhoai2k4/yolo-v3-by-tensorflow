@@ -24,17 +24,19 @@ def load_all_box_dimensions(path):
 
         tree = ET.parse(filepath)
         root = tree.getroot()
+        try:
+            for obj in root.findall('object'):
+                bndbox = obj.find('bndbox')
+                xmin = int(bndbox.find('xmin').text)
+                ymin = int(bndbox.find('ymin').text)
+                xmax = int(bndbox.find('xmax').text)
+                ymax = int(bndbox.find('ymax').text)
 
-        for obj in root.findall('object'):
-            bndbox = obj.find('bndbox')
-            xmin = int(bndbox.find('xmin').text)
-            ymin = int(bndbox.find('ymin').text)
-            xmax = int(bndbox.find('xmax').text)
-            ymax = int(bndbox.find('ymax').text)
-
-            width = xmax - xmin
-            height = ymax - ymin
-            box_dims.append([width, height])
+                width = xmax - xmin
+                height = ymax - ymin
+                box_dims.append([width, height])
+        except:
+            continue
 
     return np.array(box_dims)
 
