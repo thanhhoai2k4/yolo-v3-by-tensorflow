@@ -7,7 +7,7 @@ checkpoint_path = "model.h5"
 image_width = 416
 image_height = 416
 
-batch_size = 2
+batch_size = 16
 epochs = 100
 anchors = np.array([[[132, 172], [197, 252], [344, 428]],
                     [[52, 65], [68, 93], [96, 122]],
