@@ -14,14 +14,16 @@ anchors = np.array([[[40, 44], [59, 64], [103, 124]],
                     [[7, 8], [11, 12], [15, 17]]],
                    dtype=np.float32) / image_width
 
-class_ids = ["without_mask","with_mask"]
+class_ids = ["Human face"]
 num_class = len(class_ids)
 class_mapping_decoder = dict(zip( range(len(class_ids)), class_ids ))
 class_mapping_encoder = dict(zip(class_ids, range(len(class_ids))))
 
+try:
+    xml_list_length = os.listdir("data/annotations") # so luong huan luyen
+    xml_list_val_length = os.listdir("val/annotations") # so luong val
 
-xml_list_length = os.listdir("data/annotations") # so luong huan luyen
-xml_list_val_length = os.listdir("val/annotations") # so luong val
-
-step_per_epoch = len(xml_list_length)//batch_size
-step_per_val = len(xml_list_val_length)//batch_size
+    step_per_epoch = len(xml_list_length)//batch_size
+    step_per_val = len(xml_list_val_length)//batch_size
+except FileNotFoundError:
+    pass
