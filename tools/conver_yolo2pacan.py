@@ -38,21 +38,21 @@ def create_xml_annotation(image_filename, widthz, heightz, objects, output_folde
         xmax_number = int(x_center + width / 2)
         ymax_number = int(y_center + height / 2)
 
-        # tao 1 the co ten object
-        obj_xml = ET.SubElement(annotation, 'object')
-
-        name = ET.SubElement(obj_xml, 'name')
-        name.text = className
-
-        bndbox = ET.SubElement(obj_xml, 'bndbox')
-
-        xmin = ET.SubElement(bndbox, 'xmin')
-        ymin = ET.SubElement(bndbox, 'ymin')
-
-        xmax = ET.SubElement(bndbox, 'xmax')
-        ymax = ET.SubElement(bndbox, 'ymax')
-
         if xmax_number > xmin_number and ymax_number > ymin_number:
+            # tao 1 the co ten object
+            obj_xml = ET.SubElement(annotation, 'object')
+
+            name = ET.SubElement(obj_xml, 'name')
+            name.text = className
+
+            bndbox = ET.SubElement(obj_xml, 'bndbox')
+
+            xmin = ET.SubElement(bndbox, 'xmin')
+            ymin = ET.SubElement(bndbox, 'ymin')
+
+            xmax = ET.SubElement(bndbox, 'xmax')
+            ymax = ET.SubElement(bndbox, 'ymax')
+
             xmin.text = str(xmin_number)
             ymin.text = str(ymin_number)
 

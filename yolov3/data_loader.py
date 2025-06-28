@@ -49,7 +49,7 @@ def parse_xml(path: str, trainorval = True):
 
         return path_image, np.array(boxes, dtype=np.float32)
     except Exception as e:
-        print(e)
+        return None
 
 def box_corner_to_center(boxes):
     """
@@ -429,7 +429,13 @@ def translate_normalized_yolo(image, bboxes, max_translate_ratio=0.1):
 
 def datagenerator():
     for xml in xml_list:
-        path_image, boxes = parse_xml(xml)
+        parsed_data  = parse_xml(xml)
+        if parsed_data is None:
+            print(f"Cảnh báo: Bỏ qua file annotation bị lỗi hoặc rỗng: {xml}")
+            continue
+
+
+        path_image, boxes = parsed_data
         img = cv2.imread(path_image)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
