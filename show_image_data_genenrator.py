@@ -2,7 +2,7 @@ from yolov3.data_loader import *
 from yolov3.config import class_mapping_decoder
 
 
-def showimage(img, boxes):
+def showimage(img, boxes, filename):
 
 
 
@@ -18,9 +18,11 @@ def showimage(img, boxes):
         name_class = class_mapping_decoder[id]
         cv2.rectangle(img, (int(xmin),int(ymin)), (int(xmax),int(ymax)), (0,255,0), 2)
         cv2.putText(img, name_class, (int(xmin), int(ymin)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+    cv2.putText(img, filename, (int(20), int(20)), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0), 1)
     cv2.imshow('img', img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-for img, boxes in datagenerator_test():
-    showimage(img,boxes)
+for img, boxes, path_image in datagenerator_test():
+    print(path_image)
+    showimage(img,boxes, path_image)

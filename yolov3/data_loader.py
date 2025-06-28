@@ -519,4 +519,4 @@ def datagenerator_test():
 
         img = cv2.resize(img, (416, 416)) / 255.0
         head13, head26, head52 = encode_boxes(boxes, number_class=num_class)
-        yield np.array(img), boxes
+        yield np.array(img), boxes, path_image
