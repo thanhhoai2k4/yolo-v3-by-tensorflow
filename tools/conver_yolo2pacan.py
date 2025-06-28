@@ -72,7 +72,7 @@ def create_xml_annotation(image_filename, widthz, heightz, objects, output_folde
         f.write(pretty_xml_str)
 
 
-def convert_yolo_to_pascal_voc(xml_folder="data/annotations", image_target_folder="data/images", txt_folder="archive/labels/train", image_folder = "archive/images/train"):
+def convert_yolo_to_pascal_voc(xml_folder="data/annotations", image_target_folder="data/images", txt_folder="archive/labels/train", image_folder = "archive/images/train", number_example = 1000):
 
     class_names = class_ids
 
@@ -81,6 +81,7 @@ def convert_yolo_to_pascal_voc(xml_folder="data/annotations", image_target_folde
     os.makedirs(image_target_folder, exist_ok=True)
 
     ds_thumuc_txt = os.listdir(txt_folder) # debug thi copy: set value: ["0000bee39176697a.txt","0000eda1171fe14e.txt"]
+    index = 0
     for txt_filename in tqdm(ds_thumuc_txt):
         if not txt_filename.endswith(".txt"):
             continue
@@ -122,16 +123,19 @@ def convert_yolo_to_pascal_voc(xml_folder="data/annotations", image_target_folde
         destination_folder = os.path.join(image_target_folder, os.path.basename(image_path))
         shutil.copy(source_image_path, destination_folder)
         create_xml_annotation(os.path.basename(image_path), width, height, objects,xml_folder)
+        index += 1
+        if index >= number_example:
+            break
 
 convert_yolo_to_pascal_voc(
     xml_folder="data/annotations",
     image_target_folder="data/images",
     txt_folder="archive/labels/train",
-    image_folder = "archive/images/train")
+    image_folder = "archive/images/train", number_example = 1000)
 
 
 convert_yolo_to_pascal_voc(
     xml_folder="val/annotations",
     image_target_folder="val/images",
     txt_folder="archive/labels/val",
-    image_folder = "archive/images/val")
+    image_folder = "archive/images/val", number_example = 200)
