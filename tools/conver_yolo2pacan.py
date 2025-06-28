@@ -45,14 +45,21 @@ def create_xml_annotation(image_filename, widthz, heightz, objects, output_folde
         name.text = className
 
         bndbox = ET.SubElement(obj_xml, 'bndbox')
+
         xmin = ET.SubElement(bndbox, 'xmin')
-        xmax = ET.SubElement(bndbox, 'xmax')
         ymin = ET.SubElement(bndbox, 'ymin')
+
+        xmax = ET.SubElement(bndbox, 'xmax')
         ymax = ET.SubElement(bndbox, 'ymax')
-        xmin.text = str(xmin_number)
-        xmax.text = str(xmax_number)
-        ymin.text = str(ymin_number)
-        ymax.text = str(ymax_number)
+
+        if xmax_number > xmin_number or ymax_number > ymin_number:
+            xmin.text = str(xmin_number)
+            ymin.text = str(ymin_number)
+
+            xmax.text = str(xmax_number)
+            ymax.text = str(ymax_number)
+        else:
+            continue
 
     # Ghi file XML
     xml_str = ET.tostring(annotation)
@@ -73,7 +80,8 @@ def convert_yolo_to_pascal_voc(xml_folder="data/annotations", image_target_folde
     os.makedirs(xml_folder, exist_ok=True)
     os.makedirs(image_target_folder, exist_ok=True)
 
-    for txt_filename in tqdm(os.listdir(txt_folder)):
+    ds_thumuc_txt = os.listdir(txt_folder) # debug thi copy: set value: ["0000bee39176697a.txt","0000eda1171fe14e.txt"]
+    for txt_filename in tqdm(ds_thumuc_txt):
         if not txt_filename.endswith(".txt"):
             continue
 
