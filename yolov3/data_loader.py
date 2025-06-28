@@ -135,7 +135,13 @@ def encode_boxes(boxes: np.ndarray, grid_size_list: list[int, int, int] = [13, 2
 
     for box in boxes:
         # box: [x_center, y_center, width, height, class_id]
+        x, y , w, h ,id = box
+        x = np.clip(x, 1e-6, 0.999)
+        y = np.clip(y, 1e-6, 0.999)
+        # cap nhat lai box
+        box = [x,y,w,h,id]
 
+        
         # Tìm anchor phù hợp nhất cho box này trên tất cả các scale
         box_wh = box[2:4]
         # Mở rộng chiều để broadcasting
