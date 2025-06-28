@@ -52,7 +52,7 @@ def create_xml_annotation(image_filename, widthz, heightz, objects, output_folde
         xmax = ET.SubElement(bndbox, 'xmax')
         ymax = ET.SubElement(bndbox, 'ymax')
 
-        if xmax_number > xmin_number or ymax_number > ymin_number:
+        if xmax_number > xmin_number and ymax_number > ymin_number:
             xmin.text = str(xmin_number)
             ymin.text = str(ymin_number)
 
@@ -110,10 +110,10 @@ def convert_yolo_to_pascal_voc(xml_folder="data/annotations", image_target_folde
                 parts = line.strip().split(" ")
 
                 class_id = int(parts[0])
-                x_center = int(float(parts[1]) * width)
-                y_center = int(float(parts[2]) * height)
-                w_box = int(float(parts[3]) * width)
-                h_box = int(float(parts[4]) * height)
+                x_center = float(parts[1]) * width
+                y_center = float(parts[2]) * height
+                w_box = float(parts[3]) * width
+                h_box = float(parts[4]) * height
 
                 row = [x_center, y_center, w_box, h_box, class_id]
                 objects.append(row)
@@ -123,5 +123,15 @@ def convert_yolo_to_pascal_voc(xml_folder="data/annotations", image_target_folde
         shutil.copy(source_image_path, destination_folder)
         create_xml_annotation(os.path.basename(image_path), width, height, objects,xml_folder)
 
-convert_yolo_to_pascal_voc(xml_folder="data/annotations",image_target_folder="data/images",  txt_folder="archive/labels/train", image_folder = "archive/images/train")
-convert_yolo_to_pascal_voc(xml_folder="val/annotations", image_target_folder="val/images", txt_folder="archive/labels/val", image_folder = "archive/images/val")
+convert_yolo_to_pascal_voc(
+    xml_folder="data/annotations",
+    image_target_folder="data/images",
+    txt_folder="archive/labels/train",
+    image_folder = "archive/images/train")
+
+
+convert_yolo_to_pascal_voc(
+    xml_folder="val/annotations",
+    image_target_folder="val/images",
+    txt_folder="archive/labels/val",
+    image_folder = "archive/images/val")
