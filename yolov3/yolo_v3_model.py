@@ -184,7 +184,7 @@ def inference(path, num_classes, model):
         ac = anchors[i].reshape(-1,2)
         decoded_preds = decode_predictions(kq[i], ac, grid_size[i], num_classes)[0]
         confidences = decoded_preds[..., 4]
-        mask = confidences >= 0.5
+        mask = confidences >= 0.8
         decoded_preds = decoded_preds[mask]
         scores = confidences[mask]
 
@@ -216,8 +216,8 @@ def inference(path, num_classes, model):
 
         nameclass = class_mapping_decoder[np.argmax(p)]
 
-        cv2.rectangle(img, (x_left,y_top), (x_right,y_bottom), (0,255,0), 2)
-        cv2.putText(img, nameclass+" : " + str(c), (x_left, y_top), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+        cv2.rectangle(img, (x_left,y_top), (x_right,y_bottom), (0,255/255,0), 2)
+        cv2.putText(img, nameclass+" : " + str(c), (x_left, y_top), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255/255.0, 0), 2)
 
     try:
         filename = os.path.basename(path)
@@ -226,7 +226,8 @@ def inference(path, num_classes, model):
         print("save image access in "+ "RESULT/" + ten_file + ".png")
     except:
         pass
+    display_img = cv2.cvtColor((img*255).astype(np.uint8), cv2.COLOR_RGB2BGR)
 
-    cv2.imshow('anh', img)
+    cv2.imshow('anh', display_img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
