@@ -3,6 +3,7 @@ import cv2
 import tensorflow as tf
 import numpy as np
 from yolov3.config import anchors, class_ids, class_mapping_decoder, class_mapping_encoder, image_width, image_height, num_class
+from yolov3.data_loader import box_center_to_corner, box_corner_to_center
 
 
 def conv_bn_leaky(x, filters, kernel_size, strides=1, activation=True, bn = True):
@@ -183,7 +184,7 @@ def inference(path, num_classes, model):
         ac = anchors[i].reshape(-1,2)
         decoded_preds = decode_predictions(kq[i], ac, grid_size[i], num_classes)[0]
         confidences = decoded_preds[..., 4]
-        mask = confidences >= 0.9
+        mask = confidences >= 0.5
         decoded_preds = decoded_preds[mask]
         scores = confidences[mask]
 
@@ -193,9 +194,11 @@ def inference(path, num_classes, model):
     # luc nay all dang la 1 ds vs 3 phan tu
     # can noi tat ca cac phan tu cua ds trong ds
     all = np.array(all)
-    nms = tf.image.non_max_suppression(
-        boxes=all[..., 0:4], scores=all[...,4], max_output_size=20, iou_threshold=0.5
-    )
+    if all.shape[0] != 0:
+        nms = tf.image.non_max_suppression(
+        boxes=box_center_to_corner(all[..., 0:4]), scores=all[...,4], max_output_size=20, iou_threshold=0.5)
+    else:
+        nms = []
     for j in nms:
         x,y,w,h = all[j][:4] * 416
         c = np.round(all[j][4],2)
