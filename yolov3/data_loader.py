@@ -447,7 +447,7 @@ def datagenerator():
             img, boxes = scale_image_and_boxes(img, boxes, scale_factor)
         # ---- xoay anh
         if np.random.random() > 0.5:
-            angle = 20
+            angle = 10
             img, boxes = rotate_image_and_boxes(img, angle, boxes)
         # translate image: dich chuyen anh va boxes
         if np.random.random() > 0.5:
