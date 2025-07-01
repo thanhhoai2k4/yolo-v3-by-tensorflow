@@ -443,15 +443,15 @@ def datagenerator():
         img, boxes = data_agrument_flip(img, boxes)
         # ---- doan code de scale
         if np.random.random() > 0.5:
-            scale_factor = np.random.uniform(low=0.2, high=1.8, size=None) # None thi tra ve scalar
+            scale_factor = np.random.uniform(low=0.8, high=1.2, size=None) # None thi tra ve scalar
             img, boxes = scale_image_and_boxes(img, boxes, scale_factor)
         # ---- xoay anh
         if np.random.random() > 0.5:
-            angle = 10
+            angle = 5
             img, boxes = rotate_image_and_boxes(img, angle, boxes)
         # translate image: dich chuyen anh va boxes
         if np.random.random() > 0.5:
-            img, boxes = translate_normalized_yolo(img, boxes,max_translate_ratio=0.2)
+            img, boxes = translate_normalized_yolo(img, boxes,max_translate_ratio=0.1)
 
 
         img = cv2.resize(img, (416, 416)) / 255.0
