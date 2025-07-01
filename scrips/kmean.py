@@ -24,6 +24,8 @@ def load_all_box_dimensions(path):
 
         tree = ET.parse(filepath)
         root = tree.getroot()
+        width_image = float(tree.find('size').find('width').text)
+        height_image = float(tree.find('size').find('height').text)
         try:
             for obj in root.findall('object'):
                 bndbox = obj.find('bndbox')
@@ -32,10 +34,10 @@ def load_all_box_dimensions(path):
                 xmax = int(bndbox.find('xmax').text)
                 ymax = int(bndbox.find('ymax').text)
 
-                width = xmax - xmin
-                height = ymax - ymin
-                box_dims.append([width, height])
-        except:
+                width = int((xmax - xmin) / width_image * NETWORK_INPUT_SIZE)
+                height = int((ymax - ymin) / height_image * NETWORK_INPUT_SIZE)
+                box_dims.append([width , height ])
+        except Exception as e:
             continue
 
     return np.array(box_dims)
