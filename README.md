@@ -42,3 +42,12 @@ ban có thể sử dụng model của tôi huấn luyện trước để sử d�
 - Loss cho box: là GIOU.
 - Sử dụng các kỉ thật để đa dạng hóa dữ liêu như: scale, rotate, tranlation,... trong github này ko sử dụng mosaic đó là kỉ thuật gép 4 ảnh thành 1 ảnh được sử dụng với tỉ lệ 100% trong yolo_v8. Đây là 1 kỉ thuật cực kì tốt.
 
+## tài liệu tham khảo:
+
+ - [TensorFlow 2 YOLOv3 Mnist detection training tutorial](https://pylessons.com/YOLOv3-TF2-mnist): chủ blog nói rất rõ về lý thuyết và code mẫu.
+ - [GitHub repository](https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3): đây là github của tác giả về yolo-v3 và v4. tuy nhiên phiên bản mà tác giả sủ dụng là tensorflow 1.0 (phiên bản tiền nhiệm).
+ - [YOLOv3: An Incremental Improvement](https://arxiv.org/pdf/1804.02767): paper.
+ - [yolov3 explained](https://wikidocs.net/181713): 1 blog về yolo v3 v4 rất chi tiết về lý thuyết và thực hành (sử dụng 1 package sẳn để huấn luyện).
+
+## Cộng sự
+    
