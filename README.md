@@ -15,12 +15,12 @@ ban có thể sử dụng model của tôi huấn luyện trước để sử d�
 
 
 ## resultset
-![image](RESULT/anh001.png)
-![image](RESULT/anh002.png)
 ![image](RESULT/anh005.png)
 ![image](RESULT/anh008.png)
 ![image](RESULT/anh009.png)
-![image](RESULT/anh010.png)
-![image](RESULT/anh011.png)
-![image](RESULT/anh012.png)
+![image](RESULT/maksssksksss250.png)
+![image](RESULT/maksssksksss757.png)
+![image](RESULT/maksssksksss762.png)
+![image](RESULT/maksssksksss787.png)
+![image](RESULT/maksssksksss788.png)
 
