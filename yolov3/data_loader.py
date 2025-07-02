@@ -506,7 +506,7 @@ def datagenerator_test():
         img, boxes = data_agrument_flip(img, boxes)
         # ---- doan code de scale
         if np.random.random() > 0.5:
-            scale_factor = np.random.uniform(low=0.2, high=1.8, size=None) # None thi tra ve scalar
+            scale_factor = np.random.uniform(low=0.8, high=1.2, size=None) # None thi tra ve scalar
             img, boxes = scale_image_and_boxes(img, boxes, scale_factor)
         # ---- xoay anh
         if np.random.random() > 0.5:
