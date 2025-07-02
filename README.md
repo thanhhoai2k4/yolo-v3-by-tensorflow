@@ -9,8 +9,9 @@
 ## Cấu trúc của dũ liệu:
 
 
-## Training model: [model.h5](https://drive.google.com/file/d/1XPIFrhRkrPI-nixMoh3Jp9KXxdRVca8_/view?usp=sharing)
+## Training model: [model.h5](https://drive.google.com/file/d/1XPIFrhRkrPI-nixMoh3Jp9KXxdRVca8_/view?usp=sharing) Khoảng 700MB.
 > python3 training.py
+
 ban có thể sử dụng model của tôi huấn luyện trước để sử dụng inference. sau đó ngay trong thư mục hiện hành bạn chạy file inference.py để chạy demo xem trước.
     - bạn có thể thêm các dữ liệu ảnh vào trong folder test/images/*
 
