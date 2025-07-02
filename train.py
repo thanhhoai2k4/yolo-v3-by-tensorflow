@@ -3,7 +3,7 @@ from yolov3.data_loader import datagenerator, datagenerator_val
 import tensorflow as tf
 from yolov3.losses import getloss
 from tensorflow.keras.callbacks import ReduceLROnPlateau
-from yolov3.config import batch_size, epochs, anchors, num_class, step_per_epoch, step_per_val, checkpoint_path
+from yolov3.config import batch_size, epochs, anchors, num_class, step_per_epoch, step_per_val, checkpoint_path, initial_learning_rate
 from tensorflow.keras.optimizers.schedules import CosineDecay
 
 
@@ -14,7 +14,6 @@ except:
     yolo_model = create_yolo_v3()
     print("create a new model yolo v3 !")
 
-initial_learning_rate = 0.001
 decay_steps = epochs * step_per_epoch
 cosine_decay_schedule = CosineDecay(
     initial_learning_rate=initial_learning_rate,
