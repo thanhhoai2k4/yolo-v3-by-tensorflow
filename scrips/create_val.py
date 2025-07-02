@@ -31,6 +31,7 @@ def create_structured_validation_set(source_annot_dir, source_image_dir, val_ann
 
     # Lấy danh sách tệp XML từ thư mục nguồn
     all_xml_files = list(src_annot_path.glob('*.xml'))
+    random.shuffle(all_xml_files)
     if not all_xml_files:
         print(f"Lỗi: Không tìm thấy tệp XML nào trong '{src_annot_path}'")
         return
