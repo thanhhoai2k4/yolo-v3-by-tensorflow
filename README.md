@@ -1,5 +1,6 @@
 # yolo-v3-by-tensorflow
 
+step by step. 
 
 
 ## install package
@@ -41,7 +42,7 @@ ban có thể sử dụng model của tôi huấn luyện trước để sử d�
 - Dữ liệu được load và xử lý bằng numpy. vì thế ko thể tạo đồ thị tính toán của tensorflow. Vì thế lúc khởi động huấn luyện thì nó mất 1 lúc lâu để tạo luồng dữ liệu.
 - Loss cho box: là GIOU.
 - Sử dụng các kỉ thật để đa dạng hóa dữ liêu như: scale, rotate, tranlation,... trong github này ko sử dụng mosaic đó là kỉ thuật gép 4 ảnh thành 1 ảnh được sử dụng với tỉ lệ 100% trong yolo_v8. Đây là 1 kỉ thuật cực kì tốt.
-- 
+- Cần bổ sung thêm dữ liệu with-out-mask và mask_weared_incorrect vì số lượng nhãn quá thấp. hoặc sử dụng kỉ thuật cân bằng bằng class-weight.
 
 ## tài liệu tham khảo:
 
