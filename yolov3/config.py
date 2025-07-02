@@ -3,7 +3,7 @@ import os
 
 
 checkpoint_path = "model.h5"
-initial_learning_rate = 0.0001
+initial_learning_rate = 0.001
 image_width = 416
 image_height = 416
 
