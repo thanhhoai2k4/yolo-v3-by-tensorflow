@@ -85,7 +85,7 @@ def t_xywh_to_xyxy(box,grid_size,anchors):
     return box_affter
 
 
-def getloss(num_class,anchors ,weight = [5.0, 2.0, 0.5, 1.0], IGNORE_THRESH=0.7):
+def getloss(num_class,anchors ,weight = [5.0, 2.0, 0.5, 1.0], IGNORE_THRESH=0.5):
     def loss_function(y_true, y_pred):
 
         batch = tf.shape(y_pred)[0]
