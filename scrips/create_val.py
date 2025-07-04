@@ -31,7 +31,6 @@ def create_structured_validation_set(source_annot_dir, source_image_dir, val_ann
 
     # Lấy danh sách tệp XML từ thư mục nguồn
     all_xml_files = list(src_annot_path.glob('*.xml'))
-    random.shuffle(all_xml_files)
     if not all_xml_files:
         print(f"Lỗi: Không tìm thấy tệp XML nào trong '{src_annot_path}'")
         return
@@ -43,7 +42,7 @@ def create_structured_validation_set(source_annot_dir, source_image_dir, val_ann
     print(f"\nTổng số cặp file: {len(all_xml_files)}")
     print(f"Sẽ di chuyển {num_to_move} cặp vào thư mục validation...")
 
-    image_extensions = ['.jpg', '.jpeg', '.png', '.bmp']
+    image_extensions = ['.jpg', '.jpeg', '.png', '.bmp', '.webp']
     moved_count = 0
 
     for xml_path in files_to_move:
@@ -57,8 +56,8 @@ def create_structured_validation_set(source_annot_dir, source_image_dir, val_ann
                 dest_image_path = val_img_path / image_path.name
 
                 # Di chuyển file
-                shutil.move(str(image_path), str(dest_image_path))
-                shutil.move(str(xml_path), str(dest_xml_path))
+                shutil.copy(str(image_path), str(dest_image_path))
+                shutil.copy(str(xml_path), str(dest_xml_path))
 
 
                 moved_count += 1
